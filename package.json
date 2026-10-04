@@ -5,6 +5,14 @@
   "type": "module",
   "license": "MIT",
   "author": "creeper5820",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creeper5820/anti-overthink.git"
+  },
+  "homepage": "https://github.com/creeper5820/anti-overthink#readme",
+  "bugs": {
+    "url": "https://github.com/creeper5820/anti-overthink/issues"
+  },
   "keywords": [
     "opencode",
     "opencode-plugin",
@@ -12,6 +20,9 @@
     "reasoning",
     "anti-overthink"
   ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
   "exports": {
     ".": "./index.ts",
     "./tui": "./tui.tsx",
