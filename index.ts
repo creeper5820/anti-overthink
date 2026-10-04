@@ -108,6 +108,17 @@ export default Plugin.define({
       }
     }
 
+    function clearMessage(sessionID: string, assistantMessageID: string | undefined) {
+      if (!assistantMessageID) {
+        clearSession(sessionID)
+        return
+      }
+      const prefix = `${sessionID}:${assistantMessageID}:`
+      for (const key of [...active.keys()]) {
+        if (key.startsWith(prefix)) clearKey(key)
+      }
+    }
+
     async function onTimeout(key: string) {
       const entry = active.get(key)
       if (!entry) return
@@ -184,8 +195,18 @@ export default Plugin.define({
               break
             }
             case "session.reasoning.ended": {
-              if (!data) break
-              clearKey(partKey(data.sessionID, data.assistantMessageID, data.ordinal))
+              if (!data?.sessionID) break
+              clearMessage(data.sessionID, data.assistantMessageID)
+              break
+            }
+            case "session.text.started":
+            case "session.text.ended":
+            case "session.tool.input.started":
+            case "session.tool.called":
+            case "session.step.ended":
+            case "session.step.failed": {
+              if (!data?.sessionID) break
+              clearMessage(data.sessionID, data.assistantMessageID)
               break
             }
             case "session.execution.interrupted":
