@@ -52,13 +52,19 @@ Add the plugin to `~/.config/opencode/opencode.jsonc`:
 - One timer per reasoning part; ending before the limit cancels it.
 - Violations are unlimited: the guard interrupts, alerts, and resumes on every timeout.
 
+## Think Guard Mode panel
+
+When the active session's model matches `models`, the TUI sidebar shows a **Think Guard Mode** panel with live status: guarding model, limit, violation count, current thinking time, and the last violation. Enable the sidebar with `session.sidebar: "auto"` in `cli.json` if it is hidden.
+
+The panel reads state through the `think-guard.status` RPC method; `status` is also callable over the HTTP API.
+
 ## Development
 
 ```sh
 npm install
 ```
 
-The plugin loads as a local OpenCode plugin: `index.ts` is the server entrypoint, `tui.ts` is the CLI entrypoint, and `rpc.ts` is the shared contract.
+The plugin loads as a local OpenCode plugin: `index.ts` is the server entrypoint, `tui.tsx` is the CLI entrypoint, and `rpc.ts` is the shared contract.
 
 ## License
 
