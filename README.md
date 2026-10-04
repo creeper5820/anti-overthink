@@ -1,5 +1,7 @@
 # anti-overthink
 
+![anti-overthink](https://gist.githubusercontent.com/creeper5820/f8dcc0735efa13edb9213328d8adea6f/raw/9b4a375496478fb3b7b04490c36c41c95f31f46d/anti-overthink.svg)
+
 An OpenCode plugin that enforces a reasoning time limit. When a model's
 thinking exceeds `thresholdMs`, the plugin interrupts the run, records an
 unobtrusive notice in the session, and resumes the task. It does not pop up
