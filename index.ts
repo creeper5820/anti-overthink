@@ -1,5 +1,5 @@
 import { Plugin } from "@opencode/plugin"
-import { ThinkGuard } from "./rpc.ts"
+import { AntiOverthink } from "./rpc.ts"
 
 type ActiveReasoning = {
   sessionID: string
@@ -27,12 +27,12 @@ const DEFAULTS = {
 }
 
 export default Plugin.define({
-  id: "think-guard",
+  id: "anti-overthink",
   async setup(ctx) {
     const raw = (ctx.options ?? {}) as GuardOptions
 
     const envThreshold = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
-      ?.THINK_GUARD_THRESHOLD_MS
+      ?.ANTI_OVERTHINK_THRESHOLD_MS
     const thresholdMs = Math.max(
       1,
       Number(envThreshold ?? raw.thresholdMs ?? DEFAULTS.thresholdMs),
@@ -60,7 +60,7 @@ export default Plugin.define({
     const partKey = (sessionID: string, messageID: string, ordinal: number) =>
       `${sessionID}:${messageID}:${ordinal}`
 
-    const registration = await ctx.rpc.register(ThinkGuard, {
+    const registration = await ctx.rpc.register(AntiOverthink, {
       status: async (input) => {
         const sessionID = (input as { sessionID: string }).sessionID
         let model = sessionModel.get(sessionID) ?? ""
@@ -125,7 +125,7 @@ export default Plugin.define({
       try {
         await ctx.session.interrupt({ sessionID })
       } catch (error) {
-        console.error("[think-guard] interrupt failed", error)
+        console.error("[anti-overthink] interrupt failed", error)
       }
 
       const message = alert.message.replaceAll("{seconds}", String(seconds))
@@ -133,12 +133,12 @@ export default Plugin.define({
       try {
         await ctx.session.synthetic({
           sessionID,
-          text: `[think-guard] ${message}\n${continuePrompt}`,
-          description: `Think Guard · ${message}`,
+          text: `[anti-overthink] ${message}\n${continuePrompt}`,
+          description: `Anti-Overthink · ${message}`,
           resume: true,
         })
       } catch (error) {
-        console.error("[think-guard] synthetic failed", error)
+        console.error("[anti-overthink] synthetic failed", error)
       }
 
       try {
@@ -149,7 +149,7 @@ export default Plugin.define({
           count,
         })
       } catch (error) {
-        console.error("[think-guard] alert emit failed", error)
+        console.error("[anti-overthink] alert emit failed", error)
       }
 
       interrupting.delete(key)
@@ -206,7 +206,7 @@ export default Plugin.define({
           }
         }
       } catch (error) {
-        if (!controller.signal.aborted) console.error("[think-guard] event stream failed", error)
+        if (!controller.signal.aborted) console.error("[anti-overthink] event stream failed", error)
       }
     })()
 

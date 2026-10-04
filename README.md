@@ -1,4 +1,4 @@
-# opencode-think-guard
+# anti-overthink
 
 OpenCode plugin that enforces a reasoning time limit:
 
@@ -15,7 +15,7 @@ Add the plugin to `~/.config/opencode/opencode.jsonc`:
 {
   "plugins": [
     {
-      "package": "/absolute/path/to/opencode-think-guard",
+      "package": "/absolute/path/to/anti-overthink",
       "options": {
         "models": ["apiko/deepseek-v4.1-flash"],
         "thresholdMs": 5000,
@@ -38,7 +38,7 @@ Add the plugin to `~/.config/opencode/opencode.jsonc`:
 | `alert.message` | `string` | built-in | Notice text; `{seconds}` is replaced with the measured duration. |
 | `continuePrompt` | `string` | built-in | Instruction sent to the model to resume the task after an interrupt. |
 
-`THINK_GUARD_THRESHOLD_MS` overrides `thresholdMs`.
+`ANTI_OVERTHINK_THRESHOLD_MS` overrides `thresholdMs`.
 
 ## Behavior
 
@@ -48,11 +48,11 @@ Add the plugin to `~/.config/opencode/opencode.jsonc`:
 - Recovery uses a single synthetic message with `resume: true`. Its `description` renders as an unobtrusive system notice (`◇` + muted text) in the transcript; its `text` is what the model receives. No user prompt is added, so your input history stays yours.
 - No toast, system notification, or sound is produced; the only UI feedback is the transcript notice and the sidebar panel.
 
-## Think Guard Mode panel
+## Anti-Overthink Mode panel
 
-When the active session's model matches `models`, the TUI sidebar shows a **Think Guard Mode** panel with live status: guarding model, limit, violation count, current thinking time, and the last violation. Enable the sidebar with `session.sidebar: "auto"` in `cli.json` if it is hidden.
+When the active session's model matches `models`, the TUI sidebar shows a **Anti-Overthink Mode** panel with live status: guarding model, limit, violation count, current thinking time, and the last violation. Enable the sidebar with `session.sidebar: "auto"` in `cli.json` if it is hidden.
 
-The panel reads state through the `think-guard.status` RPC method; `status` is also callable over the HTTP API.
+The panel reads state through the `anti-overthink.status` RPC method; `status` is also callable over the HTTP API.
 
 ## Development
 

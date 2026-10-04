@@ -1,6 +1,6 @@
 import { createSignal, onCleanup, Show } from "solid-js"
 import { Plugin } from "@opencode/plugin/tui"
-import { ThinkGuard, type ThinkGuardViolation } from "./rpc.ts"
+import { AntiOverthink, type AntiOverthinkViolation } from "./rpc.ts"
 
 type GuardStatus = {
   enforcing: boolean
@@ -14,9 +14,9 @@ type GuardStatus = {
 }
 
 export default Plugin.define({
-  id: "think-guard.tui",
+  id: "anti-overthink.tui",
   async setup(context) {
-    const guard = context.client.rpc(ThinkGuard)
+    const guard = context.client.rpc(AntiOverthink)
 
     function Panel(props: { sessionID: string }) {
       const [status, setStatus] = createSignal<GuardStatus | undefined>()
@@ -36,7 +36,7 @@ export default Plugin.define({
       const poll = setInterval(refresh, 1000)
 
       const stopViolations = guard.events.on("violated", (event) => {
-        const data = event.data as ThinkGuardViolation
+        const data = event.data as AntiOverthinkViolation
         if (data.sessionID === props.sessionID) refresh()
       })
 
@@ -59,7 +59,7 @@ export default Plugin.define({
       return (
         <Show when={status()?.enforcing}>
           <box flexDirection="column" paddingRight={2} gap={0}>
-            <text fg={context.theme.text.base}>Think Guard Mode</text>
+            <text fg={context.theme.text.base}>Anti-Overthink Mode</text>
             <text fg={context.theme.text.muted}>{`model ${status()!.model}`}</text>
             <text fg={context.theme.text.muted}>
               {`limit ${(status()!.thresholdMs / 1000).toFixed(1)}s · violations ${status()!.violations}`}

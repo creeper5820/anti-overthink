@@ -1,15 +1,16 @@
 {
-  "name": "opencode-think-guard",
+  "name": "anti-overthink",
   "version": "0.1.0",
-  "description": "OpenCode plugin that interrupts model reasoning that exceeds a time limit, raises an alert, and resumes the task",
+  "description": "OpenCode plugin that interrupts reasoning which exceeds a time limit and resumes the task with an unobtrusive session notice",
   "type": "module",
   "license": "MIT",
+  "author": "creeper5820",
   "keywords": [
     "opencode",
     "opencode-plugin",
     "plugin",
     "reasoning",
-    "guard"
+    "anti-overthink"
   ],
   "exports": {
     ".": "./index.ts",

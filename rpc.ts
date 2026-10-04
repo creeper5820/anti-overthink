@@ -1,8 +1,8 @@
 // Runtime-free RPC contract. `Rpc.define` is an identity helper, so the
 // definition is declared inline to keep this module importable from the CLI
 // entrypoint without resolving any package.
-export const ThinkGuard = {
-  id: "think-guard",
+export const AntiOverthink = {
+  id: "anti-overthink",
   methods: {
     status: {
       input: {
@@ -54,7 +54,7 @@ export const ThinkGuard = {
   },
 } as const
 
-export type ThinkGuardViolation = {
+export type AntiOverthinkViolation = {
   sessionID: string
   model: string
   seconds: number
