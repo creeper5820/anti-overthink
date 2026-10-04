@@ -32,10 +32,8 @@ export default Plugin.define({
       }
       refresh()
 
-      const timer = setInterval(() => {
-        setNow(Date.now())
-        refresh()
-      }, 500)
+      const clock = setInterval(() => setNow(Date.now()), 100)
+      const poll = setInterval(refresh, 1000)
 
       const stopViolations = guard.events.on("violated", (event) => {
         const data = event.data as ThinkGuardViolation
@@ -43,7 +41,8 @@ export default Plugin.define({
       })
 
       onCleanup(() => {
-        clearInterval(timer)
+        clearInterval(clock)
+        clearInterval(poll)
         stopViolations()
       })
 
