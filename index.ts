@@ -64,11 +64,40 @@ export default Plugin.define({
     const active = new Map<string, ActiveReasoning>()
     const interrupting = new Set<string>()
     const counts = new Map<string, number>()
+    const lastViolation = new Map<string, { seconds: number; at: number; model: string }>()
 
     const partKey = (sessionID: string, messageID: string, ordinal: number) =>
       `${sessionID}:${messageID}:${ordinal}`
 
-    const registration = await ctx.rpc.register(ThinkGuard, {})
+    const registration = await ctx.rpc.register(ThinkGuard, {
+      status: async (input) => {
+        const sessionID = (input as { sessionID: string }).sessionID
+        let model = sessionModel.get(sessionID) ?? ""
+        if (!model) {
+          try {
+            const info = await ctx.session.get({ sessionID })
+            if (info?.model?.providerID && info?.model?.id) {
+              model = `${info.model.providerID}/${info.model.id}`
+              sessionModel.set(sessionID, model)
+            }
+          } catch {
+            // session may not exist yet
+          }
+        }
+        const activeEntry = [...active.values()].find((entry) => entry.sessionID === sessionID)
+        const last = lastViolation.get(sessionID)
+        return {
+          enforcing: model !== "" && matchesModel(model),
+          model,
+          thresholdMs,
+          violations: counts.get(sessionID) ?? 0,
+          active: activeEntry !== undefined,
+          startedAt: activeEntry?.started ?? 0,
+          lastSeconds: last?.seconds ?? 0,
+          lastAt: last?.at ?? 0,
+        }
+      },
+    })
 
     function clearKey(key: string) {
       const entry = active.get(key)
@@ -100,6 +129,7 @@ export default Plugin.define({
       const seconds = Math.round(((Date.now() - entry.started) / 1000) * 10) / 10
       const count = (counts.get(sessionID) ?? 0) + 1
       counts.set(sessionID, count)
+      lastViolation.set(sessionID, { seconds, at: Date.now(), model: entry.model })
 
       try {
         await ctx.session.interrupt({ sessionID })
@@ -150,6 +180,12 @@ export default Plugin.define({
         for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
           const data = event.data as Record<string, any> | undefined
           switch (event.type) {
+            case "session.model.selected": {
+              if (data?.model?.providerID && data?.model?.id) {
+                sessionModel.set(data.sessionID, `${data.model.providerID}/${data.model.id}`)
+              }
+              break
+            }
             case "session.reasoning.started": {
               if (!data) break
               const key = partKey(data.sessionID, data.assistantMessageID, data.ordinal)
@@ -177,6 +213,7 @@ export default Plugin.define({
                 clearSession(data.sessionID)
                 sessionModel.delete(data.sessionID)
                 counts.delete(data.sessionID)
+                lastViolation.delete(data.sessionID)
               }
               break
             }

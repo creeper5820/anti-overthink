@@ -3,7 +3,40 @@
 // entrypoint without resolving any package.
 export const ThinkGuard = {
   id: "think-guard",
-  methods: {},
+  methods: {
+    status: {
+      input: {
+        type: "object",
+        properties: { sessionID: { type: "string" } },
+        required: ["sessionID"],
+        additionalProperties: false,
+      },
+      output: {
+        type: "object",
+        properties: {
+          enforcing: { type: "boolean" },
+          model: { type: "string" },
+          thresholdMs: { type: "number" },
+          violations: { type: "number" },
+          active: { type: "boolean" },
+          startedAt: { type: "number" },
+          lastSeconds: { type: "number" },
+          lastAt: { type: "number" },
+        },
+        required: [
+          "enforcing",
+          "model",
+          "thresholdMs",
+          "violations",
+          "active",
+          "startedAt",
+          "lastSeconds",
+          "lastAt",
+        ],
+        additionalProperties: false,
+      },
+    },
+  },
   events: {
     violated: {
       schema: {
