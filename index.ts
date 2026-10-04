@@ -140,7 +140,11 @@ export default Plugin.define({
       const message = alert.message.replaceAll("{seconds}", String(seconds))
 
       try {
-        await ctx.session.synthetic({ sessionID, text: `[think-guard] ${message}` })
+        await ctx.session.synthetic({
+          sessionID,
+          text: `[think-guard] ${message}\n${continuePrompt}`,
+          resume: true,
+        })
       } catch (error) {
         console.error("[think-guard] synthetic failed", error)
       }
@@ -158,12 +162,6 @@ export default Plugin.define({
         })
       } catch (error) {
         console.error("[think-guard] alert emit failed", error)
-      }
-
-      try {
-        await ctx.session.prompt({ sessionID, text: continuePrompt })
-      } catch (error) {
-        console.error("[think-guard] continue failed", error)
       }
 
       interrupting.delete(key)

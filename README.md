@@ -51,6 +51,7 @@ Add the plugin to `~/.config/opencode/opencode.jsonc`:
 - Only `session.reasoning.started` / `session.reasoning.ended` events are timed; text output and tool calls are not counted.
 - One timer per reasoning part; ending before the limit cancels it.
 - Violations are unlimited: the guard interrupts, alerts, and resumes on every timeout.
+- Recovery uses a single synthetic message (alert + continue prompt) with `resume: true`; it does not add a user prompt, so your input history stays yours.
 
 ## Think Guard Mode panel
 
