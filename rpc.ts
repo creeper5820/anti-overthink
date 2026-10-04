@@ -46,19 +46,8 @@ export const ThinkGuard = {
           model: { type: "string" },
           seconds: { type: "number" },
           count: { type: "number" },
-          title: { type: "string" },
-          message: { type: "string" },
-          variant: { type: "string", enum: ["info", "success", "warning", "error"] },
-          sound: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              when: { type: "string", enum: ["always", "focused", "blurred"] },
-            },
-            additionalProperties: false,
-          },
         },
-        required: ["sessionID", "model", "seconds", "message", "variant"],
+        required: ["sessionID", "model", "seconds"],
         additionalProperties: false,
       },
     },
@@ -70,8 +59,4 @@ export type ThinkGuardViolation = {
   model: string
   seconds: number
   count?: number
-  title?: string
-  message: string
-  variant: "info" | "success" | "warning" | "error"
-  sound?: { name?: string; when?: "always" | "focused" | "blurred" }
 }

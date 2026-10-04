@@ -13,10 +13,7 @@ type GuardOptions = {
   thresholdMs?: number
   continuePrompt?: string
   alert?: {
-    title?: string
     message?: string
-    variant?: "info" | "success" | "warning" | "error"
-    sound?: { name?: string; when?: "always" | "focused" | "blurred" }
   }
 }
 
@@ -25,10 +22,7 @@ const DEFAULTS = {
   thresholdMs: 5000,
   continuePrompt: "继续未完成的任务。保持简洁，避免长时间内部推理。",
   alert: {
-    title: "THINK LIMIT VIOLATION",
     message: "推理超过 {seconds}s，已强制终止本轮执行，任务继续。禁止再次超时。",
-    variant: "error" as const,
-    sound: { name: "error", when: "always" as const },
   },
 }
 
@@ -49,10 +43,7 @@ export default Plugin.define({
         ? raw.continuePrompt
         : DEFAULTS.continuePrompt
     const alert = {
-      title: raw.alert?.title ?? DEFAULTS.alert.title,
       message: raw.alert?.message ?? DEFAULTS.alert.message,
-      variant: raw.alert?.variant ?? DEFAULTS.alert.variant,
-      sound: raw.alert?.sound ?? DEFAULTS.alert.sound,
     }
 
     const matchesModel = (key: string) => {
@@ -143,6 +134,7 @@ export default Plugin.define({
         await ctx.session.synthetic({
           sessionID,
           text: `[think-guard] ${message}\n${continuePrompt}`,
+          description: `Think Guard · ${message}`,
           resume: true,
         })
       } catch (error) {
@@ -155,10 +147,6 @@ export default Plugin.define({
           model: entry.model,
           seconds,
           count,
-          title: alert.title,
-          message,
-          variant: alert.variant,
-          sound: alert.sound,
         })
       } catch (error) {
         console.error("[think-guard] alert emit failed", error)
