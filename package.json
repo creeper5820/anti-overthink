@@ -1,0 +1,29 @@
+{
+  "name": "opencode-think-guard",
+  "version": "0.1.0",
+  "description": "OpenCode plugin that interrupts model reasoning that exceeds a time limit, raises an alert, and resumes the task",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "plugin",
+    "reasoning",
+    "guard"
+  ],
+  "exports": {
+    ".": "./index.ts",
+    "./tui": "./tui.ts",
+    "./rpc": "./rpc.ts"
+  },
+  "files": [
+    "index.ts",
+    "tui.ts",
+    "rpc.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@opencode/plugin": "^2.0.20"
+  }
+}
