@@ -48,7 +48,7 @@ the object form to pass options:
         "models": ["deepseek/deepseek-flash", "apiko/deepseek-v4.1-flash"],
         "thresholdMs": 10000,
         "alert": {
-          "message": "Reasoning exceeded {seconds}s. Execution was interrupted and the task continues."
+          "message": "Reasoning exceeded {seconds}s (violation #{count}). Execution was interrupted and the task continues."
         },
         "continuePrompt": "Continue the unfinished task. Be concise; avoid long internal reasoning."
       }
@@ -81,8 +81,8 @@ opencode plugin add anti-overthink
 | --- | --- | --- | --- |
 | `models` | `string[]` | `[]` | Models to enforce, as `providerID/modelID` or bare `modelID`. Empty matches no model. |
 | `thresholdMs` | `number` | `5000` | Maximum duration of a single reasoning stretch. |
-| `alert.message` | `string` | built-in | Notice text; `{seconds}` is replaced with the measured duration. |
-| `continuePrompt` | `string` | built-in | Instruction sent to the model to resume the task after an interrupt. |
+| `alert.message` | `string` | built-in | Notice text. `{seconds}` is replaced with the measured duration and `{count}` with the session's violation number. |
+| `continuePrompt` | `string` | built-in | Instruction sent to the model to resume the task after an interrupt. Also supports `{seconds}` and `{count}`. |
 
 `ANTI_OVERTHINK_THRESHOLD_MS` overrides `thresholdMs`.
 

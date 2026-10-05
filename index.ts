@@ -22,7 +22,7 @@ const DEFAULTS = {
   thresholdMs: 5000,
   continuePrompt: "继续未完成的任务。保持简洁，避免长时间内部推理。",
   alert: {
-    message: "推理超过 {seconds}s，已强制终止本轮执行，任务继续。禁止再次超时。",
+    message: "推理超过 {seconds}s（第 {count} 次），已强制终止本轮执行，任务继续。禁止再次超时。",
   },
 }
 
@@ -139,12 +139,17 @@ export default Plugin.define({
         console.error("[anti-overthink] interrupt failed", error)
       }
 
-      const message = alert.message.replaceAll("{seconds}", String(seconds))
+      const message = alert.message
+        .replaceAll("{seconds}", String(seconds))
+        .replaceAll("{count}", String(count))
+      const prompt = continuePrompt
+        .replaceAll("{seconds}", String(seconds))
+        .replaceAll("{count}", String(count))
 
       try {
         await ctx.session.synthetic({
           sessionID,
-          text: `[anti-overthink] ${message}\n${continuePrompt}`,
+          text: `[anti-overthink] ${message}\n${prompt}`,
           description: `Anti-Overthink · ${message}`,
           resume: true,
         })
