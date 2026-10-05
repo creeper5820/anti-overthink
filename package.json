@@ -1,6 +1,6 @@
 {
   "name": "anti-overthink",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenCode plugin that interrupts reasoning which exceeds a time limit and resumes the task with an unobtrusive session notice",
   "type": "module",
   "license": "MIT",
