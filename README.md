@@ -8,9 +8,10 @@ unobtrusive notice in the session, and resumes the task. It does not pop up
 toasts, system notifications, or sounds.
 
 - Watches `session.reasoning.started` / `session.reasoning.ended` events for
-  the models you configure.
+  primary sessions using the models you configure.
 - Times each reasoning stretch; only thinking is counted, not text output or
   tool calls.
+- Skips subagent sessions, so child tasks are never interrupted by the guard.
 - On timeout: interrupts the session, writes one system notice, and continues
   the task. No cap on the number of violations.
 - Adds an optional **Anti-Overthink Mode** sidebar panel with live status.
@@ -89,7 +90,8 @@ opencode plugin add anti-overthink
 ## Behavior
 
 1. A `session.reasoning.started` event starts a timer for that session, but
-   only when the session's model matches `models`.
+   only when the session is primary and its model matches `models`. Sessions
+   with a `parentID` are subagents and are ignored.
 2. `session.reasoning.ended` cancels the timer. The session's execution
    lifecycle (`succeeded` / `failed` / `interrupted`) clears any leftovers.
 3. If the timer fires, the plugin calls `session.interrupt`, records one

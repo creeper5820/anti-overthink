@@ -52,6 +52,7 @@ export default Plugin.define({
     }
 
     const sessionModel = new Map<string, string>()
+    const subagentSessions = new Map<string, boolean>()
     const active = new Map<string, ActiveReasoning>()
     const interrupting = new Set<string>()
     const counts = new Map<string, number>()
@@ -60,9 +61,24 @@ export default Plugin.define({
     const partKey = (sessionID: string, messageID: string, ordinal: number) =>
       `${sessionID}:${messageID}:${ordinal}`
 
+    async function isSubagent(sessionID: string): Promise<boolean> {
+      const cached = subagentSessions.get(sessionID)
+      if (cached !== undefined) return cached
+      try {
+        const info = await ctx.session.get({ sessionID })
+        const value = Boolean(info?.parentID)
+        subagentSessions.set(sessionID, value)
+        return value
+      } catch {
+        // Never interrupt a session we cannot classify: it may be a subagent.
+        return true
+      }
+    }
+
     const registration = await ctx.rpc.register(AntiOverthink, {
       status: async (input) => {
         const sessionID = (input as { sessionID: string }).sessionID
+        const subagent = await isSubagent(sessionID)
         let model = sessionModel.get(sessionID) ?? ""
         if (!model) {
           try {
@@ -78,7 +94,7 @@ export default Plugin.define({
         const activeEntry = [...active.values()].find((entry) => entry.sessionID === sessionID)
         const last = lastViolation.get(sessionID)
         return {
-          enforcing: model !== "" && matchesModel(model),
+          enforcing: !subagent && model !== "" && matchesModel(model),
           model,
           thresholdMs,
           violations: counts.get(sessionID) ?? 0,
@@ -182,6 +198,12 @@ export default Plugin.define({
         for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
           const data = event.data as Record<string, any> | undefined
           switch (event.type) {
+            case "session.created": {
+              if (data?.sessionID) {
+                subagentSessions.set(data.sessionID, Boolean(data.parentID))
+              }
+              break
+            }
             case "session.model.selected": {
               if (data?.model?.providerID && data?.model?.id) {
                 sessionModel.set(data.sessionID, `${data.model.providerID}/${data.model.id}`)
@@ -190,6 +212,7 @@ export default Plugin.define({
             }
             case "session.reasoning.started": {
               if (!data) break
+              if (await isSubagent(data.sessionID)) break
               const key = partKey(data.sessionID, data.assistantMessageID, data.ordinal)
               clearKey(key)
               const model = sessionModel.get(data.sessionID)
@@ -224,6 +247,7 @@ export default Plugin.define({
               if (data?.sessionID) {
                 clearSession(data.sessionID)
                 sessionModel.delete(data.sessionID)
+                subagentSessions.delete(data.sessionID)
                 counts.delete(data.sessionID)
                 lastViolation.delete(data.sessionID)
               }
